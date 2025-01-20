@@ -15,7 +15,7 @@ SDL_Rect playRect = {0, 0, 0, 0};
 SDL_Rect quitRect = {0, 0, 0, 0};
 
 //Create function that will inicialise the menu — load TTF file and change global state to menu
-int initMenu(SDL_Renderer* renderer) {
+int initMenu(SDL_Renderer* renderer, char* ttext) {
     font = TTF_OpenFont(TTF_PATH, 24);
     if (!font) {
         printf("Error loading font: %s\n", TTF_GetError());
@@ -23,7 +23,7 @@ int initMenu(SDL_Renderer* renderer) {
     }
     global_state = MENU;
 
-    title = getTextureFromWords(renderer, font, "Uninvited triangle in the city of squares", (SDL_Color) {255, 255, 255, 255});
+    title = getTextureFromWords(renderer, font, ttext, (SDL_Color) {255, 255, 255, 255});
     play_option = getTextureFromWords(renderer, font, "Play",(SDL_Color) {255, 255, 255, 255});
     quit_option = getTextureFromWords(renderer, font, "Quit", (SDL_Color) {255, 255, 255, 255});
 
@@ -108,7 +108,7 @@ void handleMenuEvent(SDL_KeyboardEvent* event, SDL_Renderer* renderer) {
             playSelected = SDL_FALSE;
             break;
         case SDLK_RETURN:
-            global_state = playSelected ? GAME : QUIT;
+            global_state = playSelected ? LOAD_GAME : QUIT;
             break;
     }
 

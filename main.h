@@ -4,8 +4,10 @@
 enum gameState {
     PRELOAD,
     MENU,
+    LOAD_GAME,
     GAME,
     GAMEOVER,
+    GAMEOVER_SCREEN,
     QUIT
 };
 

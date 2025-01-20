@@ -3,7 +3,7 @@
 #include <SDL.h>
 
 
-extern int initMenu(SDL_Renderer* renderer);
+extern int initMenu(SDL_Renderer* renderer, char* title);
 extern void renderMenu(SDL_Renderer* renderer);
 
 extern void handleMenuEvent(SDL_KeyboardEvent* event, SDL_Renderer* renderer);

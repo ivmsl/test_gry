@@ -3,8 +3,8 @@
 #include "utils.h"
 #include "render_game.h"
 #include "render_menu.h"
-#include "render_gameover.h"
 #include "main.h"
+#include <time.h>
 
 
 /************************************************* 
@@ -29,6 +29,7 @@ enum gameState global_state;
 // Initialize SDL modules, create main window and renderer, set up the game loop and resource deallocation on quit 
 int main(void) {
 
+    srand(time(0));
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return 1;
@@ -56,8 +57,8 @@ int main(void) {
         SDL_Quit();
         return 1;
     }
-
-    if (initMenu(renderer) != 0) {
+    
+    if (initMenu(renderer, "Uninvited triangle in the city of squares") != 0) {
         printf("Error initializing menu\n");
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
@@ -65,7 +66,7 @@ int main(void) {
         return 1;       
     }
 
-
+    uint score = 0;
     int quit = 0;
     SDL_Event e;
     while (!quit) {
@@ -85,6 +86,16 @@ int main(void) {
                 else if (global_state == MENU) {
                     handleMenuEvent(&e.key, renderer);
                 }
+                else if (global_state == GAME && (e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_RIGHT)) {
+                    
+                    updatePlayerPosition(&e.key);
+                }
+            }
+            else if (e.type == SDL_KEYUP) {
+             if (global_state == GAME && (e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_RIGHT)) {
+                    
+                    updatePlayerPosition(&e.key);
+                }
             }
         }
 
@@ -92,13 +103,25 @@ int main(void) {
             case MENU:
                 renderMenu(renderer);
                 break;
-            case GAME:
+            case LOAD_GAME:
                 deInitMenu();
-             //   renderGame(renderer);
+                if (initGame(renderer) != 0) {
+                    printf("Error initializing game\n");
+                };
+                global_state = GAME;
+                break;
+            case GAME:
+                gameRoutine(renderer);
+                renderGame(renderer);
                 break;
             case GAMEOVER:
-              //  renderGameOver(renderer);
+                score = gameDeinit();
+                char buf[128];
+                sprintf(buf, "Your score: %d. Wanna play again?", score);
+                initMenu(renderer, buf);
+                global_state = MENU;
                 break;
+            
             case QUIT:
                 quit = 1;
                 break;
