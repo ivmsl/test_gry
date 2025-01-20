@@ -10,7 +10,7 @@ SDL_LIBS = $(shell sdl2-config --libs) -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 INCLUDES = -I/opt/homebrew/include/SDL2 -I./src
 
 # Source files
-SRCS = main.c 
+SRCS = main.c render_menu.c utils.c
 
 # Obj files
 OBJ_DIR = ./build/Debug

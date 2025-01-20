@@ -42,17 +42,19 @@ SDL_Texture* loadTexture(SDL_Renderer* renderer, const char* path) {
 }
 
 
-SDL_Texture* getTextureFromWords(SDL_Renderer* renderer, TTF_Font* font, char* text) {
-    SDL_Color black = {0, 0, 0, 255};
+SDL_Texture* getTextureFromWords(SDL_Renderer* renderer, TTF_Font* font, char* text, SDL_Color col) {
     
-    SDL_Surface* tmp = TTF_RenderText_Blended(font, text, black);
+    SDL_Surface* tmp = TTF_RenderText_Blended(font, text, col);
     if (!tmp) {
         printf("Error getting text surface: %s\n", TTF_GetError());
+        return NULL;
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tmp);
     if (!texture) {
         printf("Error creating texture: %s\n", SDL_GetError());
+        SDL_FreeSurface(tmp);
+        return NULL;
     }
 
     SDL_FreeSurface(tmp);

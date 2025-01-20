@@ -4,6 +4,7 @@
 #include "render_game.h"
 #include "render_menu.h"
 #include "render_gameover.h"
+#include "main.h"
 
 
 /************************************************* 
@@ -22,6 +23,8 @@
 *
 *************************************************/
 
+
+enum gameState global_state;
 
 // Initialize SDL modules, create main window and renderer, set up the game loop and resource deallocation on quit 
 int main(void) {
@@ -48,24 +51,68 @@ int main(void) {
 
     if (TTF_Init() < 0) {
         printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
         return 1;
+    }
+
+    if (initMenu(renderer) != 0) {
+        printf("Error initializing menu\n");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;       
     }
 
 
     int quit = 0;
     SDL_Event e;
     while (!quit) {
+
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        SDL_RenderClear(renderer);
+
+
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 quit = 1;
             }
+            else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    quit = 1;
+                }
+                else if (global_state == MENU) {
+                    handleMenuEvent(&e.key, renderer);
+                }
+            }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
+        switch (global_state) {
+            case MENU:
+                renderMenu(renderer);
+                break;
+            case GAME:
+                deInitMenu();
+             //   renderGame(renderer);
+                break;
+            case GAMEOVER:
+              //  renderGameOver(renderer);
+                break;
+            case QUIT:
+                quit = 1;
+                break;
+            default:
+                break;
+        }
+
+
+//        SDL_RenderPresent(renderer);
+        
+        SDL_Delay(10);
     }
 
+    deInitMenu();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
